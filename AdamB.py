@@ -6,13 +6,13 @@ class AdamB(Optimizer):
     def __init__(
             self, params, lr=1e-4, betas=(0.9, 0.999), eps=1e-8, pretrained=True,
             back_level_max=1, back_level_min=0, back_pow=2):
-        assert 0<= back_level_max <= 1, "back_level_max should be in [0, 1]"
+        assert 0 <= back_level_max <= 1, "back_level_max should be in [0, 1]"
         defaults = dict(
             lr=lr, betas=betas, eps=eps, back_level_max=back_level_max, back_level_min=back_level_min, 
             pretrained=pretrained, back_pow=back_pow)
         super().__init__(params, defaults)
         self.init_all()
-        
+
     @torch.no_grad()
     def init_all(self):
         for group in self.param_groups:
@@ -28,7 +28,7 @@ class AdamB(Optimizer):
                 else:
                     state['exp_avg'] = torch.zeros_like(p)
                     state['exp_avg_sq'] = torch.zeros_like(p)
-    
+
     @torch.no_grad()
     def step(self):
         for group in self.param_groups:
@@ -53,7 +53,7 @@ class AdamB(Optimizer):
                 exp_avg_sq.mul_(beta2).addcmul_(grad, grad, value=1 - beta2)  # v_t
                 denom = (exp_avg_sq.sqrt() / math.sqrt(bias_correction2)).add_(group['eps'])
                 update = (exp_avg / bias_correction1).div_(denom)
-                
+
                 if pretrained:
                     D_value = state['D_value']
                     p_index, num_layers, back_level_max, back_level_min = state['p_index'], group['num_layers'], group['back_level_max'], group['back_level_min']
@@ -64,4 +64,3 @@ class AdamB(Optimizer):
                     D_value.add_(update, alpha=-group['lr'])
                 else:
                     p.add_(update, alpha=-group['lr'])
-        return 
