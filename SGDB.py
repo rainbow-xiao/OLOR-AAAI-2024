@@ -6,13 +6,13 @@ class SGDB(Optimizer):
     def __init__(
             self, params, lr=1e-3, beta=0.9, dampening=0.0, eps=1e-8, pretrained=True,
             back_level_max=1, back_level_min=0, back_pow=2):
-        assert 0<= back_level_max <= 1, "back_level_max should be in [0, 1]"
+        assert 0 <= back_level_max <= 1, "back_level_max should be in [0, 1]"
         defaults = dict(
             lr=lr, beta=beta, dampening=dampening, eps=eps, back_level_max=back_level_max, back_level_min=back_level_min, 
             pretrained=pretrained, back_pow=back_pow)
         super().__init__(params, defaults)
         self.init_all()
-        
+
     @torch.no_grad()
     def init_all(self):
         for group in self.param_groups:
@@ -26,7 +26,7 @@ class SGDB(Optimizer):
                     state['momentum'] = torch.zeros_like(p)
                 else:
                     state['momentum'] = torch.zeros_like(p)
-                    
+
     @torch.no_grad()
     def step(self):
         for group in self.param_groups:
@@ -38,7 +38,7 @@ class SGDB(Optimizer):
                 group['step'] += 1
             else:
                 group['step'] = 1
-            
+
             for p in group['params']:
                 if p.grad is None:
                     continue
@@ -54,7 +54,6 @@ class SGDB(Optimizer):
                     update.add_(D_value, alpha=back_level)
                     p.add_(update, alpha=-group['lr'])
                     D_value.add_(update, alpha=-group['lr'])
-                    
+
                 else:
                     p.add_(momentum, alpha=-group['lr'])
-        return 
