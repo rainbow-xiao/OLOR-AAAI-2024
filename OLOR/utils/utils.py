@@ -35,7 +35,7 @@ def get_optim_from_config(config, model):
 def config_from_name(module_name):
     name = 'get_config'
     module = importlib.import_module(module_name)
-    config = getattr(module, name)
+    config = getattr(module, name)()
     return config
 
 def set_seed(seed=1):
